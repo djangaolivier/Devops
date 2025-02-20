@@ -1,0 +1,47 @@
+create and set up repository
+https://github.com/      username: djangaolivier Password: Djanga@123
+
+https://github.com/login
+
+https://github.com/classlinux9/LinuxDevops
+
+password: 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
+
+
+
+
+-----------------------------SETUP your repository on your server ----------------------------------- 
+yum install git -y
+
+------------ check git version
+             git --version
+
+----------------- set up your local repository 
+
+- set a name that is identifiable for credit when review version history
+     eg. git config --global user.name "Michael Zock"
+
+- set an email address that will be associated with each history marker
+    eg. git config --global user.email "linuxclass102022@gmail.com"
+
+- set automatic command line coloring for Git for easy reviewing
+git config --global color.ui auto
+set automatic command line coloring for Git for easy reviewing
+
+----------------------COMMAND to set-up ---------------------------------------------------
+git add name
+git commit -a -m "message you want"
+git push origin main or branch name
+git branch ster (it's to create a branch)
+git branch checkout name (it's to switch branch)
+git pull then name (it's to update your file before starting working)
+
+--------------------COMMAND for your own set up-------------
+ls -al ~/.ssh/
+  cat ~/.ssh/
+  cat ~/.ssh/id_rsa.pub
+  ssh -T git@github.com
+  git clone git@github.com:djangaolivier/Devops.git
+  cd Devops/
+  git pull origin master
+
