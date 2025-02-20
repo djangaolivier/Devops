@@ -1,0 +1,87 @@
+---
+- name: Automate Server Provisioning and Configuration
+  hosts: all
+  become: yes
+  vars:
+    timezone: "America/Chicago"
+    users:
+      - name: devops
+        groups: sudo
+        password: "{{ 'P@ssword123' | password_hash('sha512') }}"
+    firewall_rules:
+      - port: 22
+        proto: tcp
+      - port: 80
+        proto: tcp
+      - port: 443
+        proto: tcp
+    packages:
+      - vim
+      - git
+      - curl
+      - htop
+      - python3
+      - python3-pip
+  tasks:
+    - name: Update package lists
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+    
+    - name: Install required packages
+      package:
+        name: "{{ packages }}"
+        state: present
+    
+    - name: Set system timezone
+      timezone:
+        name: "{{ timezone }}"
+    
+    - name: Add users
+      user:
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
+        groups: "{{ item.groups }}"
+        shell: /bin/bash
+        state: present
+      loop: "{{ users }}"
+    
+    - name: Configure SSH for key-based authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+      notify: Restart SSH
+    
+    - name: Enable and configure firewall
+      ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+      loop: "{{ firewall_rules }}"
+    
+    - name: Enable and start firewall
+      service:
+        name: ufw
+        state: started
+        enabled: yes
+    
+    - name: Deploy web application
+      git:
+        repo: 'https://github.com/classlinux9/LinuxDevops'
+        dest: /var/www/webapp
+        version: main
+    
+    - name: Set permissions for web application
+      file:
+        path: /var/www/webapp
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+  
+  handlers:
+    - name: Restart SSH
+      service:
+        name: sshd
+        state: restarted

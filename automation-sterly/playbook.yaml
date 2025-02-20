@@ -1,0 +1,39 @@
+---
+- name: we are updating and upgrading all the servers
+  hosts: all
+  become: yes
+  become_user: root
+  tasks:
+      - name: updating all servers
+        yum:
+          name: '*'
+          state: latest  
+      - name: lists all the disks
+        shell: lsblk
+        register: lsblk_out
+      - name: create file on all servers
+        file:
+           name: sammy.txt
+           state: touch
+      - name: create directory
+        file:
+           name: sandradir
+           state: directory
+      - name: display disks
+        debug: 
+           var: lsblk_out.stdout_lines
+
+- name: web server deployment
+  hosts: clients
+  become: yes
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: latest
+    - name: start apache service
+      service:
+        name: httpd
+        state: started
+
+
